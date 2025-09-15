@@ -1,4 +1,4 @@
-User Stories: 
+## User Stories: 
 1. Answer Checker: User inputs math problems → program checks correctness. Adaptation: program can generate random math problems instead of relying on parent input. 
 2. Memory Bank: Original: parent stored problems for child to solve later. Adaptation: program generates and stores problems for recall/redo. 
 3. Number Guesser: Game mode where user tries to guess a secret number with feedback. user selects a random secret number so that the user can play a game with feedback the user guesses numbers, 
