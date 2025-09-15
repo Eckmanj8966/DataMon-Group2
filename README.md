@@ -8,7 +8,7 @@ At the moment, if the user doesn't enter the correct type of character (e.g. ent
 The next steps would be adding memory bank as well as the number guesser, while also making improvements to menus and user experience.
 
 
-User Stories:
+## User Stories:
 !.Answer Checker:
 User inputs math problems → program checks correctness.
 Adaptation: program can generate random math problems instead of relying on parent input.
