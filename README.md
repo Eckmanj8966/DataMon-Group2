@@ -5,4 +5,4 @@ The Menu and Answer Checker give the requested results when prompted.
 - **What Didn't:**
 At the moment, if the user doesn't enter the correct type of character (e.g. enter a number between 1-4 and they enter "b"), it would crash the program.
 - **What to do differently (next steps):**
-
+The next steps would be adding memory bank as well as the number guesser, while also making improvements to menus and user experience.
