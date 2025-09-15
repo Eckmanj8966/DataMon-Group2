@@ -16,12 +16,12 @@ Adaptation: program can generate random math problems instead of relying on pare
 Original: parent stored problems for child to solve later.
 Adaptation: program generates and stores problems for recall/redo.
 3. Number Guesser:
-Game mode where user tries to guess a secret number with feedback.
+Gamemode where user tries to guess a secret number with feedback.
 user selects a random secret number so that the user can play a game with feedback
-the user guesses numbers, program picksapart the question so that the user solves not just for the answer,but ensures thatkey also understand the question as a whole.
+the user guesses numbers, program picks apart the question so that the user solves not just for the answer, but ensures thatkey also understand the question as a whole.
 
-Summary of What the Program Does: In the beginning 
-Starts with a main menu (4 choices).
+Summary of What the Program Does: 
+In the beginning the program starts with a main menu (4 choices).
 
 Answer Checker (choice 1) lets the user:
 Pick an operation (+, -, *, /). Enter numbers.
