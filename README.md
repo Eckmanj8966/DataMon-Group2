@@ -9,7 +9,7 @@ The next steps would be adding memory bank as well as the number guesser, while 
 
 
 ## User Stories:
-!.Answer Checker:
+1. Answer Checker:
 User inputs math problems → program checks correctness.
 Adaptation: program can generate random math problems instead of relying on parent input.
 2. Memory Bank:
