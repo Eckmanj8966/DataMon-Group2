@@ -1,6 +1,6 @@
 # 9/13/2025
 # 
-# Group 2: Joshua Eckman, Myra Williams, 
+# Group 2
 
 import datamon_functions as df
 
@@ -41,4 +41,5 @@ def main():
 if __name__ == "__main__":
 
     main()
+
 
