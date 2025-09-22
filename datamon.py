@@ -2,7 +2,7 @@
 # 
 # Group 2
 
-import datamon_functions as df
+import answer_checker as ac
 
 def main():
     choice = None
@@ -23,7 +23,7 @@ def main():
         # Menu choices:
         # Answer Checker
         if choice == 1:
-            df.answer_checker()
+            ac.answer_checker()
         
         # Memory Bank
         elif choice == 2:
@@ -41,5 +41,6 @@ def main():
 if __name__ == "__main__":
 
     main()
+
 
 
