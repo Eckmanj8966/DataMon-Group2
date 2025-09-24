@@ -3,6 +3,7 @@
 # Group 2
 
 import answer_checker as ac
+import memory_bank as mb
 
 def main():
     choice = None
@@ -32,7 +33,7 @@ def main():
         
         # Memory Bank
         elif choice == 2:
-            print("DEBUG: 2")
+            mb.menu()
             
         # Number Guesser
         elif choice == 3:
@@ -46,6 +47,7 @@ def main():
 if __name__ == "__main__":
 
     main()
+
 
 
 
