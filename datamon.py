@@ -18,7 +18,12 @@ def main():
         print("---------------------")
         
         # Get user choice
-        choice = int(input("Please enter the number of your choice: "))
+        try:
+            choice = int(input("Please enter the number of your choice: "))
+            print("")
+        except ValueError:
+            print("Invalid Input. Please enter a valid input: ")
+            continue
         
         # Menu choices:
         # Answer Checker
