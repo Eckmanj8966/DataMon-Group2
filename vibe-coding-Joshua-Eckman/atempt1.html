@@ -1,0 +1,624 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Tic-Tac-Toe — Single File</title>
+  <style>
+    :root{
+      --bg:#0f1724;
+      --card:#0b1220;
+      --accent:#7dd3fc;
+      --accent-2:#60a5fa;
+      --muted:#94a3b8;
+      --win:#10b981;
+      --lose:#ef4444;
+      --glass: rgba(255,255,255,0.03);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      background:linear-gradient(180deg,#071226 0%, #031025 100%);
+      color:#e6eef8;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:24px;
+      -webkit-font-smoothing:antialiased;
+      -moz-osx-font-smoothing:grayscale;
+    }
+
+    .container{
+      width:100%;
+      max-width:980px;
+      background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+      border-radius:14px;
+      padding:22px;
+      box-shadow: 0 8px 30px rgba(2,6,23,0.7);
+      display:grid;
+      grid-template-columns: 360px 1fr;
+      gap:20px;
+      align-items:start;
+    }
+
+    /* Left column: controls & score */
+    .panel{
+      background:var(--card);
+      border-radius:10px;
+      padding:16px;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.02);
+    }
+
+    h1{font-size:20px;margin:0 0 8px}
+    p.muted{color:var(--muted);margin:0 0 12px;font-size:13px}
+
+    .controls { display:flex; flex-direction:column; gap:10px; }
+    .row { display:flex; gap:8px; align-items:center; }
+    .btn{
+      background:linear-gradient(180deg,var(--accent),var(--accent-2));
+      border:0;padding:8px 12px;border-radius:8px;color:#012235;font-weight:600;
+      cursor:pointer; box-shadow:0 6px 16px rgba(96,165,250,0.12);
+      transition:transform .12s ease, box-shadow .12s;
+    }
+    .btn:active{transform:translateY(1px)}
+    .btn.ghost{background:transparent;color:var(--accent);box-shadow:none;border:1px solid rgba(125,211,252,0.08)}
+    .select, .toggle {
+      background:var(--glass); border:1px solid rgba(255,255,255,0.03); padding:8px 10px; border-radius:8px; color:inherit;
+    }
+    .small{font-size:13px;padding:6px 10px}
+
+    .scoreboard{
+      display:grid;
+      grid-template-columns: repeat(3,1fr);
+      gap:8px;margin-top:12px;
+    }
+    .score{
+      background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+      padding:12px;border-radius:8px;text-align:center;
+    }
+    .score .num{font-size:20px;font-weight:700}
+    .status{
+      margin-top:12px;padding:10px;border-radius:8px;background:linear-gradient(90deg, rgba(125,211,252,0.05), rgba(96,165,250,0.02));
+      color:var(--accent);
+      font-weight:600;
+      display:flex;align-items:center;gap:10px;
+    }
+
+    /* Board */
+    .board-wrap{
+      display:flex;flex-direction:column;gap:12px;
+    }
+    .board-card{
+      background:linear-gradient(180deg, rgba(255,255,255,0.015), rgba(255,255,255,0.01));
+      border-radius:12px;padding:18px;
+    }
+
+    .board{
+      width:100%;
+      max-width:520px;
+      aspect-ratio:1;
+      display:grid;
+      grid-template-columns:repeat(3,1fr);
+      gap:12px;
+      touch-action: manipulation;
+    }
+    .cell{
+      background:rgba(255,255,255,0.02);
+      border-radius:12px;
+      display:flex;align-items:center;justify-content:center;
+      font-size:54px;font-weight:700;color:#dbeafe;
+      cursor:pointer;user-select:none;
+      transition:transform .12s ease, background .12s;
+      border:1px solid rgba(255,255,255,0.02);
+      position:relative;
+      outline: none;
+    }
+    .cell:focus{box-shadow:0 0 0 3px rgba(125,211,252,0.12)}
+    .cell:hover{transform:translateY(-3px)}
+    .cell.disabled{cursor:default;opacity:0.9;transform:none}
+    .cell.x{color:#7dd3fc}
+    .cell.o{color:#60a5fa}
+
+    .marker{
+      pointer-events:none;
+      display:inline-block; transform-origin:center center;
+    }
+
+    .winning {
+      box-shadow: 0 8px 30px rgba(16,185,129,0.14), inset 0 0 18px rgba(16,185,129,0.06);
+      animation:pop .45s cubic-bezier(.2,.9,.2,1);
+    }
+    @keyframes pop{from{transform:scale(.9)}to{transform:none}}
+
+    .controls-footer{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+
+    footer.info{font-size:12px;color:var(--muted);margin-top:8px}
+
+    /* small screen */
+    @media (max-width:860px){
+      .container{grid-template-columns:1fr; padding:14px}
+      .board{max-width:100%}
+    }
+  </style>
+</head>
+<body>
+  <main class="container" id="app">
+    <section class="panel" aria-labelledby="title">
+      <div>
+        <h1 id="title">Tic-Tac-Toe</h1>
+        <p class="muted">Classic 3×3. Play vs Player or vs Computer (perfect AI). Keyboard accessible — use arrow keys and Enter/Space.</p>
+      </div>
+
+      <div class="controls" aria-live="polite">
+        <div class="row" style="justify-content:space-between;">
+          <label class="row" title="Play against computer or another human">
+            <input type="checkbox" id="vsComputer" class="toggle" aria-label="Play against computer" />
+            &nbsp;<span style="font-size:13px">Play vs Computer</span>
+          </label>
+          <div style="display:flex;gap:8px;align-items:center">
+            <label for="playerSymbol" class="muted" style="font-size:13px">You play:</label>
+            <select id="playerSymbol" class="select small" aria-label="Choose your symbol">
+              <option value="X">X (goes first)</option>
+              <option value="O">O</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="row" style="margin-top:6px">
+          <button id="newGame" class="btn">New Game</button>
+          <button id="resetScores" class="btn ghost small">Reset Scores</button>
+        </div>
+
+        <div class="scoreboard" aria-hidden="false" style="margin-top:8px">
+          <div class="score" aria-label="X score">
+            <div style="font-size:12px;color:var(--muted)">X</div>
+            <div class="num" id="scoreX">0</div>
+          </div>
+          <div class="score" aria-label="Draws">
+            <div style="font-size:12px;color:var(--muted)">Draws</div>
+            <div class="num" id="scoreD">0</div>
+          </div>
+          <div class="score" aria-label="O score">
+            <div style="font-size:12px;color:var(--muted)">O</div>
+            <div class="num" id="scoreO">0</div>
+          </div>
+        </div>
+
+        <div class="status" id="status" role="status" aria-live="polite" style="margin-top:12px">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <path d="M3 12h18M3 6h18M3 18h18" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          <div id="statusText">X to move</div>
+        </div>
+
+        <div class="controls-footer">
+          <button id="undoBtn" class="btn ghost small" title="Undo last move (only works in human vs human)">Undo</button>
+          <button id="hintBtn" class="btn small ghost" title="Show a recommended move">Hint</button>
+        </div>
+
+        <footer class="info">Tip: use Tab to focus cells, arrow keys to navigate, Enter/Space to place.</footer>
+      </div>
+    </section>
+
+    <section class="board-wrap">
+      <div class="board-card">
+        <div id="board" class="board" role="grid" aria-label="Tic Tac Toe board" tabindex="0"></div>
+      </div>
+
+      <div style="display:flex;gap:12px;align-items:center;justify-content:space-between">
+        <div style="color:var(--muted);font-size:13px">Made with ❤️ — perfect AI uses Minimax</div>
+        <div>
+          <button id="exportBtn" class="btn ghost small">Export HTML</button>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script>
+  // Single-file Tic-Tac-Toe
+  (function(){
+    // --- Game state ---
+    const EMPTY = null;
+    let board = Array(9).fill(EMPTY);
+    let current = 'X'; // 'X' or 'O'
+    let humanSymbol = 'X';
+    let vsComputer = false;
+    let scores = { X:0, O:0, D:0 };
+    let lastMoveStack = []; // for undo (stores index and symbol)
+    let gameOver = false;
+    let hintTimeout = null;
+
+    // DOM
+    const boardEl = document.getElementById('board');
+    const statusText = document.getElementById('statusText');
+    const scoreX = document.getElementById('scoreX');
+    const scoreO = document.getElementById('scoreO');
+    const scoreD = document.getElementById('scoreD');
+    const vsComputerEl = document.getElementById('vsComputer');
+    const playerSymbolEl = document.getElementById('playerSymbol');
+    const newGameBtn = document.getElementById('newGame');
+    const resetScoresBtn = document.getElementById('resetScores');
+    const undoBtn = document.getElementById('undoBtn');
+    const hintBtn = document.getElementById('hintBtn');
+    const exportBtn = document.getElementById('exportBtn');
+
+    // Create 9 cells
+    function createBoardUI(){
+      boardEl.innerHTML = '';
+      for(let i=0;i<9;i++){
+        const cell = document.createElement('button');
+        cell.className = 'cell';
+        cell.setAttribute('role','gridcell');
+        cell.setAttribute('aria-label',`Cell ${i+1}`);
+        cell.dataset.index = i;
+        cell.type = 'button';
+        cell.tabIndex = 0;
+        cell.addEventListener('click', onCellClick);
+        cell.addEventListener('keydown', onCellKeyDown);
+        boardEl.appendChild(cell);
+      }
+    }
+
+    // --- Utilities ---
+    function setStatus(msg){
+      statusText.textContent = msg;
+    }
+    function updateScoresUI(){
+      scoreX.textContent = scores.X;
+      scoreO.textContent = scores.O;
+      scoreD.textContent = scores.D;
+    }
+    function isBoardFull(b){
+      return b.every(cell => cell !== EMPTY);
+    }
+
+    // Winning lines
+    const LINES = [
+      [0,1,2],[3,4,5],[6,7,8], // rows
+      [0,3,6],[1,4,7],[2,5,8], // cols
+      [0,4,8],[2,4,6] // diags
+    ];
+
+    // Check win: returns {winner:'X'/'O',line:[...]} or null
+    function checkWin(b){
+      for(const line of LINES){
+        const [a,b1,c] = line;
+        if(b[a] && b[a] === b[b1] && b[a] === b[c]){
+          return { winner: b[a], line };
+        }
+      }
+      return null;
+    }
+
+    // Render board
+    function renderBoard(){
+      for(let i=0;i<9;i++){
+        const cell = boardEl.children[i];
+        const val = board[i];
+        cell.classList.remove('x','o','disabled','winning');
+        cell.innerHTML = '';
+        cell.disabled = false;
+        if(val){
+          cell.classList.add(val.toLowerCase());
+          const span = document.createElement('span');
+          span.className = 'marker';
+          span.textContent = val;
+          cell.appendChild(span);
+          cell.classList.add('disabled');
+        }
+      }
+
+      // show winning highlight if any
+      const win = checkWin(board);
+      if(win){
+        for(const idx of win.line){
+          const c = boardEl.children[idx];
+          c.classList.add('winning');
+        }
+      }
+
+      if(gameOver){
+        // disable remaining
+        for(let i=0;i<9;i++){
+          boardEl.children[i].disabled = true;
+        }
+      }
+    }
+
+    // Make a move (index) by current player; returns true if placed
+    function placeMove(index, player){
+      if(gameOver) return false;
+      if(board[index] !== EMPTY) return false;
+      board[index] = player;
+      lastMoveStack.push({ idx:index, who:player });
+      current = (player === 'X') ? 'O' : 'X';
+      evaluateAfterMove();
+      return true;
+    }
+
+    function evaluateAfterMove(){
+      const win = checkWin(board);
+      if(win){
+        gameOver = true;
+        scores[win.winner]++;
+        setStatus(`${win.winner} wins!`);
+        updateScoresUI();
+      } else if(isBoardFull(board)){
+        gameOver = true;
+        scores.D++;
+        setStatus(`Draw`);
+        updateScoresUI();
+      } else {
+        setStatus(`${current} to move`);
+      }
+      renderBoard();
+    }
+
+    // --- AI (Minimax) ---
+    // Score: +10 for X win, -10 for O win, 0 for draw from perspective of X.
+    function minimax(b, maximizing){ // returns {score, index}
+      const win = checkWin(b);
+      if(win){
+        return { score: (win.winner === 'X') ? 10 : -10 };
+      }
+      if(isBoardFull(b)){
+        return { score: 0 };
+      }
+
+      const player = maximizing ? 'X' : 'O';
+      let best = { score: maximizing ? -Infinity : Infinity, index: -1 };
+      for(let i=0;i<9;i++){
+        if(b[i] === EMPTY){
+          b[i] = player;
+          const result = minimax(b, !maximizing);
+          b[i] = EMPTY;
+          const sc = result.score;
+          if(maximizing){
+            if(sc > best.score){
+              best.score = sc; best.index = i;
+            }
+          } else {
+            if(sc < best.score){
+              best.score = sc; best.index = i;
+            }
+          }
+        }
+      }
+      return best;
+    }
+
+    // Choose AI move: perfect. If human plays O and AI is X, maximize; else minimize.
+    function aiChooseMove(){
+      // If AI is X, maximizing true. AI symbol is opposite of humanSymbol when vsComputer true.
+      const aiSymbol = humanSymbol === 'X' ? 'O' : 'X';
+      const maximizing = (aiSymbol === 'X');
+      // Use minimax on a copy
+      const bcopy = board.slice();
+      const choice = minimax(bcopy, maximizing);
+      return choice.index; // may be -1 if something weird happens
+    }
+
+    // --- Event handlers ---
+    function onCellClick(e){
+      const idx = Number(e.currentTarget.dataset.index);
+      handlePlayerMove(idx);
+    }
+
+    function onCellKeyDown(e){
+      const idx = Number(e.currentTarget.dataset.index);
+      if(e.key === 'Enter' || e.key === ' '){
+        e.preventDefault();
+        handlePlayerMove(idx);
+      }
+    }
+
+    // Keyboard navigation for grid (arrow keys move focus)
+    boardEl.addEventListener('keydown', function(e){
+      const active = document.activeElement;
+      if(!active || !active.classList.contains('cell')) return;
+      const idx = Number(active.dataset.index);
+      let target = null;
+      if(e.key === 'ArrowRight') target = idx + 1;
+      if(e.key === 'ArrowLeft') target = idx - 1;
+      if(e.key === 'ArrowDown') target = idx + 3;
+      if(e.key === 'ArrowUp') target = idx - 3;
+      if(target !== null){
+        if(target >=0 && target < 9){
+          boardEl.children[target].focus();
+          e.preventDefault();
+        }
+      }
+    });
+
+    function handlePlayerMove(idx){
+      if(gameOver) return;
+      // If vsComputer, and humanSymbol must match current
+      if(vsComputer){
+        if(current !== humanSymbol){
+          // not human's turn
+          return;
+        }
+      }
+      if(board[idx] !== EMPTY) return;
+      placeMove(idx, current);
+      renderBoard();
+      // If after move, game not over and vsComputer and it's AI's turn, let AI move
+      if(vsComputer && !gameOver && current !== humanSymbol){
+        // small delay for UX
+        setTimeout(()=> {
+          const aiIdx = aiChooseMove();
+          if(aiIdx >=0) placeMove(aiIdx, current === 'X' ? 'X' : 'O'); // placeMove uses provided player; but current holds next so compute
+          renderBoard();
+        }, 220);
+      }
+    }
+
+    // New Game
+    function newGame(resetScores=false){
+      board = Array(9).fill(EMPTY);
+      gameOver = false;
+      lastMoveStack = [];
+      // current should be X unless human symbol is O and vsComputer and computer wants to go first
+      current = 'X';
+      // If vsComputer and human chose O -> computer (X) goes first
+      if(vsComputer && humanSymbol === 'O'){
+        // let computer play X immediately after clearing board
+        setStatus('Computer (X) thinking...');
+        renderBoard();
+        setTimeout(()=>{
+          const aiIdx = aiChooseMove();
+          if(aiIdx >= 0){
+            board[aiIdx] = 'X';
+            lastMoveStack.push({ idx: aiIdx, who: 'X' });
+            current = 'O';
+            evaluateAfterMove();
+          }
+        }, 200);
+      } else {
+        setStatus(`${current} to move`);
+        renderBoard();
+      }
+      if(resetScores){
+        scores = { X:0, O:0, D:0 };
+        updateScoresUI();
+      }
+    }
+
+    // Undo (only allowed when not vsComputer)
+    function undo(){
+      if(vsComputer){
+        alert('Undo is only available in Player vs Player mode.');
+        return;
+      }
+      if(lastMoveStack.length === 0) return;
+      const last = lastMoveStack.pop();
+      board[last.idx] = EMPTY;
+      // switch current back to the player who made undone move
+      current = last.who;
+      gameOver = false;
+      setStatus(`${current} to move`);
+      renderBoard();
+    }
+
+    // Hint: show recommended move briefly
+    function hint(){
+      if(hintTimeout) clearTimeout(hintTimeout);
+      // Determine who to compute hint for: current player
+      const player = current;
+      // If playing vsComputer and it's AI's turn, no hint
+      if(vsComputer && current !== humanSymbol){
+        return;
+      }
+      // For hint, use minimax but from perspective of X; we need to find best move for 'current'
+      // We'll try all empties and pick move that leads to best outcome for current
+      const empties = board.map((v,i)=> v===EMPTY ? i : -1).filter(i=>i>=0);
+      if(empties.length === 0) return;
+      // If only one move: highlight it
+      let bestIdx = empties[0];
+      if(empties.length === 1){
+        bestIdx = empties[0];
+      } else {
+        if(player === (humanSymbol === 'X' ? 'X' : 'O') ){
+          // Use a quick scoring: simulate if current is X maximize, if O minimize
+          const maximizing = (player === 'X');
+          let bestScore = maximizing ? -Infinity : Infinity;
+          for(const idx of empties){
+            board[idx] = player;
+            const result = minimax(board.slice(), player === 'X'); // pass maximizing for next
+            board[idx] = EMPTY;
+            const s = result.score;
+            if(maximizing){
+              if(s > bestScore){ bestScore = s; bestIdx = idx; }
+            } else {
+              if(s < bestScore){ bestScore = s; bestIdx = idx; }
+            }
+          }
+        } else {
+          bestIdx = empties[Math.floor(Math.random()*empties.length)];
+        }
+      }
+      // flash highlight
+      const c = boardEl.children[bestIdx];
+      c.classList.add('winning');
+      hintTimeout = setTimeout(()=> c.classList.remove('winning'), 900);
+    }
+
+    // Export current HTML file content: create an anchor linking to the same page's HTML.
+    function exportHTML(){
+      const content = document.documentElement.outerHTML;
+      const blob = new Blob([content], { type: 'text/html' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'tic-tac-toe.html';
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
+    }
+
+    // --- Wire up controls ---
+    vsComputerEl.addEventListener('change', (e)=>{
+      vsComputer = e.target.checked;
+      // If switching to vsComputer and human chooses O then computer should start immediately in a new game
+      newGame(false);
+    });
+
+    playerSymbolEl.addEventListener('change', (e)=>{
+      humanSymbol = e.target.value;
+      newGame(false);
+    });
+
+    newGameBtn.addEventListener('click', ()=> newGame(false));
+    resetScoresBtn.addEventListener('click', ()=> {
+      if(confirm('Reset scores?')){
+        scores = { X:0, O:0, D:0 };
+        updateScoresUI();
+      }
+    });
+
+    undoBtn.addEventListener('click', undo);
+    hintBtn.addEventListener('click', hint);
+    exportBtn.addEventListener('click', exportHTML);
+
+    // Keyboard: global undo with Ctrl+Z
+    document.addEventListener('keydown', (e)=>{
+      if((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'z'){
+        e.preventDefault();
+        undo();
+      }
+    });
+
+    // Initialization
+    createBoardUI();
+
+    // Restore scores from sessionStorage if available
+    try {
+      const saved = sessionStorage.getItem('ttt_scores_v1');
+      if(saved){
+        const obj = JSON.parse(saved);
+        if(obj && typeof obj === 'object') scores = Object.assign(scores, obj);
+      }
+    } catch(e){/* ignore */}
+
+    updateScoresUI();
+
+    // Save scores before unload
+    window.addEventListener('beforeunload', ()=>{
+      try { sessionStorage.setItem('ttt_scores_v1', JSON.stringify(scores)); } catch(e){}
+    });
+
+    // Start a fresh game
+    newGame(false);
+
+    // Simple responsive focus: focus first cell on load
+    setTimeout(()=> {
+      if(boardEl.children[0]) boardEl.children[0].tabIndex = 0;
+      boardEl.children[0].focus();
+    }, 50);
+  })();
+  </script>
+</body>
+</html>

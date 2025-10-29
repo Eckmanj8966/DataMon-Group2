@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Tic-Tac-Toe</title>
+  <style>
+    :root {
+      --bg-color: #121212;
+      --text-color: #ffffff;
+      --board-bg: #1e1e1e;
+      --cell-border: #444;
+      --accent-color: #00bcd4;
+      --button-bg: #00bcd4;
+      --button-text: #000;
+    }
+
+    body.light {
+      --bg-color: #f0f0f0;
+      --text-color: #000000;
+      --board-bg: #ffffff;
+      --cell-border: #ccc;
+      --accent-color: #00796b;
+      --button-bg: #00796b;
+      --button-text: #fff;
+    }
+
+    body {
+      font-family: Arial, sans-serif;
+      background-color: var(--bg-color);
+      color: var(--text-color);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      margin: 0;
+      transition: background-color 0.3s, color 0.3s;
+    }
+
+    h1 {
+      margin-bottom: 20px;
+    }
+
+    .board {
+      display: grid;
+      grid-template-columns: repeat(3, 100px);
+      grid-template-rows: repeat(3, 100px);
+      gap: 5px;
+      background-color: var(--board-bg);
+      padding: 10px;
+      border-radius: 10px;
+    }
+
+    .cell {
+      width: 100px;
+      height: 100px;
+      background-color: var(--board-bg);
+      border: 2px solid var(--cell-border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2.5em;
+      cursor: pointer;
+      border-radius: 5px;
+      transition: background-color 0.3s, color 0.3s;
+    }
+
+    .cell:hover {
+      background-color: var(--accent-color);
+      color: var(--button-text);
+    }
+
+    .status {
+      margin: 20px;
+      font-size: 1.2em;
+    }
+
+    .controls {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    button {
+      padding: 10px 20px;
+      background-color: var(--button-bg);
+      color: var(--button-text);
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 1em;
+      transition: background-color 0.3s, color 0.3s;
+    }
+
+    button:hover {
+      opacity: 0.9;
+    }
+
+    .toggle-container {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .toggle-container label {
+      font-size: 0.9em;
+    }
+
+    .toggle-container input {
+      width: 40px;
+      height: 20px;
+      appearance: none;
+      background-color: #ccc;
+      border-radius: 20px;
+      position: relative;
+      outline: none;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+
+    .toggle-container input:checked {
+      background-color: var(--accent-color);
+    }
+
+    .toggle-container input::before {
+      content: '';
+      position: absolute;
+      top: 2px;
+      left: 2px;
+      width: 16px;
+      height: 16px;
+      background-color: #fff;
+      border-radius: 50%;
+      transition: transform 0.3s;
+    }
+
+    .toggle-container input:checked::before {
+      transform: translateX(20px);
+    }
+  </style>
+</head>
+<body>
+  <h1>Tic-Tac-Toe</h1>
+  <div class="board" id="board"></div>
+  <div class="status" id="status">Player X's turn</div>
+
+  <div class="controls">
+    <div class="toggle-container">
+      <label for="modeToggle">🌙</label>
+      <input type="checkbox" id="modeToggle" />
+      <label for="modeToggle">☀️</label>
+    </div>
+
+    <div class="toggle-container">
+      <label for="cpuToggle">👤</label>
+      <input type="checkbox" id="cpuToggle" />
+      <label for="cpuToggle">💻</label>
+    </div>
+
+    <button id="resetBtn">Reset Game</button>
+    <button id="exportBtn">Export HTML</button>
+  </div>
+
+  <script>
+    const board = document.getElementById('board');
+    const statusText = document.getElementById('status');
+    const resetBtn = document.getElementById('resetBtn');
+    const exportBtn = document.getElementById('exportBtn');
+    const modeToggle = document.getElementById('modeToggle');
+    const cpuToggle = document.getElementById('cpuToggle');
+
+    let currentPlayer = 'X';
+    let gameActive = true;
+    const cells = Array(9).fill(null);
+
+    function createBoard() {
+      board.innerHTML = '';
+      for (let i = 0; i < 9; i++) {
+        const cell = document.createElement('div');
+        cell.classList.add('cell');
+        cell.dataset.index = i;
+        cell.addEventListener('click', handleCellClick);
+        board.appendChild(cell);
+      }
+    }
+
+    function handleCellClick(e) {
+      const index = e.target.dataset.index;
+      if (!gameActive || cells[index]) return;
+      makeMove(index);
+      if (cpuToggle.checked && gameActive && currentPlayer === 'O') {
+        setTimeout(() => computerMove(), 400);
+      }
+    }
+
+    function makeMove(index) {
+      if (cells[index] || !gameActive) return;
+      cells[index] = currentPlayer;
+      document.querySelector(`[data-index='${index}']`).textContent = currentPlayer;
+
+      if (checkWin(cells, currentPlayer)) {
+        statusText.textContent = `Player ${currentPlayer} wins!`;
+        gameActive = false;
+        return;
+      }
+
+      if (cells.every(cell => cell)) {
+        statusText.textContent = "It's a draw!";
+        gameActive = false;
+        return;
+      }
+
+      currentPlayer = currentPlayer === 'X' ? 'O' : 'X';
+      statusText.textContent = `Player ${currentPlayer}'s turn`;
+    }
+
+    function computerMove() {
+      const best = findBestMove(cells);
+      makeMove(best);
+    }
+
+    function findBestMove(boardState) {
+      let bestScore = -Infinity;
+      let move = null;
+      for (let i = 0; i < 9; i++) {
+        if (!boardState[i]) {
+          boardState[i] = 'O';
+          let score = minimax(boardState, 0, false);
+          boardState[i] = null;
+          if (score > bestScore) {
+            bestScore = score;
+            move = i;
+          }
+        }
+      }
+      return move;
+    }
+
+    const scores = {
+      O: 1,
+      X: -1,
+      draw: 0
+    };
+
+    function minimax(boardState, depth, isMaximizing) {
+      const winner = getWinner(boardState);
+      if (winner) return scores[winner];
+
+      if (isMaximizing) {
+        let bestScore = -Infinity;
+        for (let i = 0; i < 9; i++) {
+          if (!boardState[i]) {
+            boardState[i] = 'O';
+            let score = minimax(boardState, depth + 1, false);
+            boardState[i] = null;
+            bestScore = Math.max(score, bestScore);
+          }
+        }
+        return bestScore;
+      } else {
+        let bestScore = Infinity;
+        for (let i = 0; i < 9; i++) {
+          if (!boardState[i]) {
+            boardState[i] = 'X';
+            let score = minimax(boardState, depth + 1, true);
+            boardState[i] = null;
+            bestScore = Math.min(score, bestScore);
+          }
+        }
+        return bestScore;
+      }
+    }
+
+    function getWinner(boardState) {
+      const winCombos = [
+        [0,1,2],[3,4,5],[6,7,8],
+        [0,3,6],[1,4,7],[2,5,8],
+        [0,4,8],[2,4,6]
+      ];
+      for (let combo of winCombos) {
+        const [a,b,c] = combo;
+        if (boardState[a] && boardState[a] === boardState[b] && boardState[a] === boardState[c]) {
+          return boardState[a];
+        }
+      }
+      return boardState.every(cell => cell) ? 'draw' : null;
+    }
+
+    function checkWin(boardState, player) {
+      const winCombos = [
+        [0,1,2],[3,4,5],[6,7,8],
+        [0,3,6],[1,4,7],[2,5,8],
+        [0,4,8],[2,4,6]
+      ];
+      return winCombos.some(combo => {
+        const [a,b,c] = combo;
+        return boardState[a] === player && boardState[b] === player && boardState[c] === player;
+      });
+    }
+
+    function resetGame() {
+      for (let i = 0; i < cells.length; i++) cells[i] = null;
+      currentPlayer = 'X';
+      gameActive = true;
+      statusText.textContent = "Player X's turn";
+      createBoard();
+    }
+
+    function exportHTML() {
+      const htmlContent = document.documentElement.outerHTML;
+      const blob = new Blob([htmlContent], { type: 'text/html' });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = 'tic-tac-toe.html';
+      a.click();
+    }
+
+    modeToggle.addEventListener('change', () => {
+      document.body.classList.toggle('light', modeToggle.checked);
+    });
+
+    resetBtn.addEventListener('click', resetGame);
+    exportBtn.addEventListener('click', exportHTML);
+    createBoard();
+  </script>
+</body>
+</html>

@@ -1,0 +1,49 @@
+PART 1:
+
+Prompt 1:
+"Build me a complete, working Tic-Tac-Toe that runs in a web browser. 
+Make it a single HTML file that I can just open and use. 
+Include all the JavaScript and CSS needed."
+
+Notes 1:
+It seems to be working, attempting to break the program seems difficult as I have yet to find a way to do so.
+
+____________
+Prompt 2:
+"Add a light mode toggle to the left of the "Export HTML" button at the bottom of the application."
+
+Notes 2:
+ChatGPT generated a the new code (I forgot to ask it to keep the original code) and the "vs Computer" toggle no longer seems to be working. Also a lot of the instructions and tips are now missing.
+
+____________
+Prompt 3:
+"Could you add the dark/light mode toggle to the first HTML code without removing or changing it?"
+
+Notes 3:
+It did not keep any of the original format of the first atempt, though nothing seems to be broken.
+
+____________
+Prompt 4:
+"Without changing the appearance, layout, or functionality of the current features, add a vs computer toggle"
+
+Notes 4:
+Everything is working fine, but the vs computer is very easy to beat and seems to have little to no stratagy.
+
+____________
+Prompt 5:
+"Without changing its current appearance, make the "vs computer" smarter."
+
+Notes 5:
+The program seems to be working perfectly, and the "vs computer" is a lot smarter. I am not good at Tic-Tac-Toe to begin with so I am unsure if it is too difficult.
+
+________________________
+PART 2:
+
+Notes:
+After asking it to explain Single Page Applications and their frameworks, it recommended for me to use react. I was confused on what to do with the code it gave me at first, but it also recommended I use CodeSandbox.io to run it, after doing so and clicking a square it gives me a ReferenceError "checkWin is not defined".
+
+________________________
+PART 3:
+
+What you learned:
+The AI, in some instances, can generate working code but has difficulty changing it unless you are very specific; even then it can sometimes do things you don't want or break the code.
