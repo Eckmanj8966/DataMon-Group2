@@ -1,0 +1,15 @@
+Flask Features:
+- Considered lightweight and simple compared to other Python frameworks.
+- Contains mostly the essentials needed for wed development.
+- Requires knowledge of HTML.
+
+Streamlit Features:
+- Ideal for making data driven web apps and dashboards.
+- Claims to be easy to use.
+- Requires no knowledge of HTML.
+
+My Choice & Why:
+I will be going for Streamlit, I have had some exposure to the library in a previous semester and hope that the AI will not struggle with it too much.
+
+Anticipated Challenge:
+From what I have experienced in LAB.3.0 Vibe Coding I know that unless I am very specific, having the AI fix or add new things to the code can cause issues.
