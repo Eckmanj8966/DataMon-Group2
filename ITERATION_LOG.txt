@@ -1,0 +1,34 @@
+Prompt 1"
+"Build a Streamlit app that accepts a math equation then prompts the user for the answer. If they are correct or incorrect it will let them know. Also include error handling."
+
+What worked / didn't 1:
+After running the code most of it seems to be working, there is one problem being that the "Clear equation" button seems to give an error, though It doesn't break the application.
+
+
+_______________
+Prompt 2"
+"When running the code I get this error "[ERROR CODE HERE]" what does it mean and how would do we fix it?"
+
+What worked / didn't 2:
+The app worked just as good as before, but the error was still there.
+
+
+_______________
+Prompt 3"
+"Add a random easy math problem button without changing the UI or base code. Also as the "Clear equation" button seems to still not work, replace it with text instructing the user so that if they wish to try a new equation, they will have to replace the equation at the top of the page."
+
+What worked / didn't 3:
+The app seems to be working very well. As instructed it added a "Random easy math problem" button below the "Set equation" button, It also removed the "Clear equation" button and replaced it with a message box saying: "To try a new equation, replace the expression in the box at the top of the page and press Set equation.".
+
+_________________________
+Document where AI helped:
+After getting used Visual Studio Code again and getting the app to run, it seemed to follow most of my instructions pretty well.
+
+Document where AI struggled or failed:
+The error caused by the "Clear equation" button seemed to have stumped the AI as its atempts at fixing it didn't do so.
+
+Note when you had to intervene manually:
+Luckily I didn't have to intervene much as the code worked pretty well.
+
+Record your iteration count:
+As seen above, I made 3 iterations.
